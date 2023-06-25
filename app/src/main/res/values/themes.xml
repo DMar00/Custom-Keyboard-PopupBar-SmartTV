@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.KeyboardBase" parent="@style/Theme.Leanback" />
+</resources>
