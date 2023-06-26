@@ -55,12 +55,6 @@ public class KeyboardImeService extends InputMethodService {
             Log.d("KeyboardImeService", "onKeyDown code: "+ keyCode);
             ic = getCurrentInputConnection();
             switch (keyCode){
-                case KeyEvent.KEYCODE_1:
-                    Log.d("MOD 1","selected");
-                    break;
-                case KeyEvent.KEYCODE_2:
-                    Log.d("MOD 2","selected");
-                    break;
                 case KeyEvent.KEYCODE_BACK:
                     hideKeyboard();
                     break;
@@ -92,13 +86,59 @@ public class KeyboardImeService extends InputMethodService {
                         if(code!=Controller.ENTER_KEY && code!=Controller.DEL_KEY)
                             controller.getTextController().addCharacterWritten(character);
                         handleText(code, ic);
-                        if(isLetter(key.getLabel().charAt(0))) {
+                        //if letter or space
+                        if(isLetter(key.getLabel().charAt(0)) || key.getLabel().charAt(0)==' ') {
                             controller.showPopUpBar();
                         }else {
                             controller.hidePopUpBar();
                         }
                     }else {
                         controller.hidePopUpBar();
+                    }
+                    break;
+                case KeyEvent.KEYCODE_1:
+                case KeyEvent.KEYCODE_PROG_RED:
+                    //write char
+                    if(controller.getSuggestionsController().isShown()){
+                        Key k1 = controller.getFourSuggestionsCode().get(0);
+                        handleText( k1.getCode(), ic);
+                        controller.getTextController().addCharacterWritten(k1.getLabel().charAt(0));
+                        //update bar
+                        Cell redFocus = controller.getKeysController().getCharPosition(k1.getLabel().charAt(0));
+                        controller.movePopUpBar(redFocus);
+                    }
+                    break;
+                case KeyEvent.KEYCODE_2:
+                case KeyEvent.KEYCODE_PROG_GREEN:
+                    if(controller.getSuggestionsController().isShown()){
+                        Key k2 = controller.getFourSuggestionsCode().get(1);
+                        handleText( k2.getCode(), ic);
+                        controller.getTextController().addCharacterWritten(k2.getLabel().charAt(0));
+                        //update bar
+                        Cell greenFocus = controller.getKeysController().getCharPosition(k2.getLabel().charAt(0));
+                        controller.movePopUpBar(greenFocus);
+                    }
+                    break;
+                case KeyEvent.KEYCODE_3:
+                case KeyEvent.KEYCODE_PROG_YELLOW:
+                    if(controller.getSuggestionsController().isShown()){
+                        Key k3 = controller.getFourSuggestionsCode().get(2);
+                        handleText( k3.getCode(), ic);
+                        controller.getTextController().addCharacterWritten(k3.getLabel().charAt(0));
+                        //update bar
+                        Cell yellowFocus = controller.getKeysController().getCharPosition(k3.getLabel().charAt(0));
+                        controller.movePopUpBar(yellowFocus);
+                    }
+                    break;
+                case KeyEvent.KEYCODE_4:
+                case KeyEvent.KEYCODE_PROG_BLUE:
+                    if(controller.getSuggestionsController().isShown()){
+                        Key k4 = controller.getFourSuggestionsCode().get(3);
+                        handleText( k4.getCode(), ic);
+                        controller.getTextController().addCharacterWritten(k4.getLabel().charAt(0));
+                        //update bar
+                        Cell blueFocus = controller.getKeysController().getCharPosition(k4.getLabel().charAt(0));
+                        controller.movePopUpBar(blueFocus);
                     }
                     break;
             }

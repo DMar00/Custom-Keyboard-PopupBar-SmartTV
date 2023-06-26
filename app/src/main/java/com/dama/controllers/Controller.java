@@ -8,10 +8,12 @@ import android.widget.FrameLayout;
 import com.dama.customkeyboardpopupcolorstv.R;
 import com.dama.utils.Cell;
 import com.dama.utils.Key;
+import com.dama.utils.Utils;
 import com.dama.views.KeyView;
 import com.dama.views.PopupBarView;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Controller {
@@ -120,6 +122,14 @@ public class Controller {
         return textController;
     }
 
+    public SuggestionsController getSuggestionsController() {
+        return suggestionsController;
+    }
+
+    public void setSuggestionsController(SuggestionsController suggestionsController) {
+        this.suggestionsController = suggestionsController;
+    }
+
     /*********************SUGGESTIONS**********************/
     public void showPopUpBar(){
         //generate suggestions
@@ -127,7 +137,10 @@ public class Controller {
         char[] allSuggestions = suggestionsController.getSuggestionsChars(sequence);
 
         //get only first 4 suggestions
-        char[] fourSuggestions = Arrays.copyOfRange(allSuggestions, 0, 4);
+        //todo distance
+        char[] checkedSuggestions = getCheckedSuggestions(allSuggestions);
+        char[] fourSuggestions = Arrays.copyOfRange(checkedSuggestions, 0, 4);
+        suggestionsController.setCurrentSuggestions(fourSuggestions[0], fourSuggestions[1], fourSuggestions[2], fourSuggestions[3]);
 
         //put sug in bar
         viewsController.fillPopBar(fourSuggestions[0], fourSuggestions[1], fourSuggestions[2], fourSuggestions[3]);
@@ -153,9 +166,67 @@ public class Controller {
         suggestionsController.setShown(false);
     }
 
-    /*********************OTHER**********************/
-    /*protected void modifyKeyContent(Cell position, int code, String label){
-        keysController.modifyKeyAtPosition(position, code, label);
-        viewsController.modifyKeyLabel(position, label);
-    }*/
+    public void movePopUpBar(Cell newFocus){
+        //delete bar and highlights
+        hidePopUpBar();
+        //set new focus
+        focusController.setCurrentFocus(newFocus);
+        moveFocusOnKeyboard(newFocus);
+        //show bar updated
+        showPopUpBar();
+    }
+
+    public ArrayList<Key> getFourSuggestionsCode(){
+        char[] sug = suggestionsController.getCurrentSuggestions();
+        ArrayList <Key> keys = new ArrayList<>();
+        for(char c : sug){
+            Key k = keysController.getCharToKey(c);
+            keys.add(k);
+        }
+        return  keys;
+    }
+
+    /*********************DISTANCE SUGGESTIONS**********************/
+    private char[] getCheckedSuggestions(char[] allSuggestions){ //allSuggestions has size = 12
+        for(char c : allSuggestions)
+            Log.d("allSuggestions","c: "+c);
+
+        ArrayList<Character> charsToDelete = new ArrayList<>();
+
+        //delete from suggestions clicked highlight letter
+        Cell curFocus = focusController.getCurrentFocus();
+        char d2 = keysController.getKeyAtPosition(curFocus).getLabel().charAt(0);
+        Log.d("toDelete","del d2: "+d2);
+        charsToDelete.add(d2);
+
+        //delete from suggestions letter distance < 2
+        int dim = allSuggestions.length-charsToDelete.size();
+        Log.d("dimens","N: "+ dim);
+        char[] checkedSuggestions = new char[allSuggestions.length-charsToDelete.size()];
+        int i = 0;
+        for(char c: allSuggestions){
+            Cell sugCell = keysController.getCharPosition(c);
+            int clicks = getClicksNumber(curFocus, sugCell);
+            Log.d("distance","curFocus: "+keysController.getKeyAtPosition(curFocus).getLabel()+" - letter: "+c+" - ["+clicks+"]");
+            if(!charsToDelete.contains(c) && i<dim && clicks>=2){
+                checkedSuggestions[i] = c;
+                i++;
+            }
+        }
+
+        return checkedSuggestions;
+    }
+
+    public int getClicksNumber(Cell selected, Cell other){
+        Cell selectedCell = selected;
+        Cell otherCell = other;
+
+        int difRow = Math.abs(selectedCell.getRow()-otherCell.getRow());
+        int difCol = Math.abs(selectedCell.getCol()-otherCell.getCol());
+        int difCol2 = (Controller.COLS) - difCol;
+        int clicks =  difRow + Math.min(difCol, difCol2);
+
+        return clicks;
+    }
+
 }
