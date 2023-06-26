@@ -1,5 +1,7 @@
 package com.dama.service;
 
+import static java.lang.Character.isLetter;
+
 import android.inputmethodservice.InputMethodService;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -13,6 +15,7 @@ import com.dama.customkeyboardpopupcolorstv.R;
 import com.dama.log.TemaImeLogger;
 import com.dama.utils.Cell;
 import com.dama.utils.Key;
+import com.dama.views.PopupBarView;
 
 public class KeyboardImeService extends InputMethodService {
     private Controller controller;
@@ -24,8 +27,9 @@ public class KeyboardImeService extends InputMethodService {
     @Override
     public View onCreateInputView() {
         rootView = (FrameLayout) this.getLayoutInflater().inflate(R.layout.keyboard_layout, null);
+        PopupBarView popupBarView = (PopupBarView) this.getLayoutInflater().inflate(R.layout.popup_bar, null);
         controller = new Controller(getApplicationContext(), rootView);
-        controller.drawKeyboard();
+        controller.drawKeyboard(popupBarView);
 
         temaImeLogger = new TemaImeLogger(getApplicationContext());
 
@@ -52,10 +56,10 @@ public class KeyboardImeService extends InputMethodService {
             ic = getCurrentInputConnection();
             switch (keyCode){
                 case KeyEvent.KEYCODE_1:
-                    Log.d("MOD 1 QWERTY","selected");
+                    Log.d("MOD 1","selected");
                     break;
                 case KeyEvent.KEYCODE_2:
-                    Log.d("MOD 2 ABC","selected");
+                    Log.d("MOD 2","selected");
                     break;
                 case KeyEvent.KEYCODE_BACK:
                     hideKeyboard();
@@ -68,6 +72,8 @@ public class KeyboardImeService extends InputMethodService {
                     temaImeLogger.writeToLog("UP",false);
                 case KeyEvent.KEYCODE_DPAD_DOWN:
                     temaImeLogger.writeToLog("DOWN",false);
+
+                    controller.hidePopUpBar();
                     Cell newCell = controller.findNewFocus(keyCode);
                     if (controller.isNextFocusable(newCell)){
                         //update focus
@@ -82,7 +88,17 @@ public class KeyboardImeService extends InputMethodService {
                     Key key = controller.getKeysController().getKeyAtPosition(focus);
                     int code = key.getCode();
                     if(code!=Controller.FAKE_KEY){
+                        char character = (char) code;
+                        if(code!=Controller.ENTER_KEY && code!=Controller.DEL_KEY)
+                            controller.getTextController().addCharacterWritten(character);
                         handleText(code, ic);
+                        if(isLetter(key.getLabel().charAt(0))) {
+                            controller.showPopUpBar();
+                        }else {
+                            controller.hidePopUpBar();
+                        }
+                    }else {
+                        controller.hidePopUpBar();
                     }
                     break;
             }
