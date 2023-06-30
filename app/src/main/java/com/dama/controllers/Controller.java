@@ -33,7 +33,6 @@ public class Controller {
 
     public Controller(Context context, FrameLayout rootView) {
         keysController = new KeysController(new Keyboard(context, R.xml.qwerty));
-        //keysController = new KeysController(new Keyboard(context, R.xml.abc));
         focusController = new FocusController();
         focusController.setCurrentFocus(new Cell(1,0)); //q
         viewsController = new ViewsController(rootView);
@@ -42,6 +41,7 @@ public class Controller {
     }
 
     public void drawKeyboard(PopupBarView popupBarView){
+        Log.d("drawKeyboard","");
         viewsController.drawKeyboard(keysController.getAllKeys(), focusController.getCurrentFocus(), popupBarView);
     }
 
@@ -106,6 +106,12 @@ public class Controller {
 
     public void moveFocusOnKeyboard(Cell position){
         viewsController.moveCursorPosition(position);
+    }
+
+    public void resetFocus(){
+        Cell r = new Cell(1,0);
+        focusController.setCurrentFocus(r);
+        moveFocusOnKeyboard(r);
     }
 
 
@@ -208,7 +214,7 @@ public class Controller {
             Cell sugCell = keysController.getCharPosition(c);
             int clicks = getClicksNumber(curFocus, sugCell);
             Log.d("distance","curFocus: "+keysController.getKeyAtPosition(curFocus).getLabel()+" - letter: "+c+" - ["+clicks+"]");
-            if(!charsToDelete.contains(c) && i<dim && clicks>=2){
+            if(!charsToDelete.contains(c) && i<dim && clicks>2){
                 checkedSuggestions[i] = c;
                 i++;
             }
@@ -217,14 +223,14 @@ public class Controller {
         return checkedSuggestions;
     }
 
-    public int getClicksNumber(Cell selected, Cell other){
+    public int getClicksNumber(Cell selected, Cell other) {
         Cell selectedCell = selected;
         Cell otherCell = other;
 
-        int difRow = Math.abs(selectedCell.getRow()-otherCell.getRow());
-        int difCol = Math.abs(selectedCell.getCol()-otherCell.getCol());
+        int difRow = Math.abs(selectedCell.getRow() - otherCell.getRow());
+        int difCol = Math.abs(selectedCell.getCol() - otherCell.getCol());
         int difCol2 = (Controller.COLS) - difCol;
-        int clicks =  difRow + Math.min(difCol, difCol2);
+        int clicks = difRow + Math.min(difCol, difCol2);
 
         return clicks;
     }

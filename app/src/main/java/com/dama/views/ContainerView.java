@@ -172,17 +172,21 @@ public class ContainerView extends FrameLayout {
         layoutParams.leftMargin = x; //set x
         layoutParams.topMargin = y; //set y
         switch (type){
-            case 0:
+            case 0 :
                 highLightRed.setLayoutParams(layoutParams);
+                highLightRed.changeDimension(keyView.getKeyHeight(), keyView.getKeyWidth(), 0);
                 break;
             case 1 :
                 highLightGreen.setLayoutParams(layoutParams);
+                highLightGreen.changeDimension(keyView.getKeyHeight(), keyView.getKeyWidth(), 0);
                 break;
             case 2 :
                 highLightYellow.setLayoutParams(layoutParams);
+                highLightYellow.changeDimension(keyView.getKeyHeight(), keyView.getKeyWidth(), 0);
                 break;
-            case 3:
+            case 3 :
                 highLightBlue.setLayoutParams(layoutParams);
+                highLightBlue.changeDimension(keyView.getKeyHeight(), keyView.getKeyWidth(), 0);
                 break;
         }
 

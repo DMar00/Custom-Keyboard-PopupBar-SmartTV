@@ -27,13 +27,19 @@ public class KeyboardImeService extends InputMethodService {
     @Override
     public View onCreateInputView() {
         rootView = (FrameLayout) this.getLayoutInflater().inflate(R.layout.keyboard_layout, null);
-        PopupBarView popupBarView = (PopupBarView) this.getLayoutInflater().inflate(R.layout.popup_bar, null);
         controller = new Controller(getApplicationContext(), rootView);
+
+        PopupBarView popupBarView = (PopupBarView) this.getLayoutInflater().inflate(R.layout.popup_bar, null);
         controller.drawKeyboard(popupBarView);
 
         temaImeLogger = new TemaImeLogger(getApplicationContext());
 
         return rootView;
+    }
+
+    @Override
+    public boolean onEvaluateFullscreenMode() {
+        return false;
     }
 
     @Override
@@ -46,7 +52,10 @@ public class KeyboardImeService extends InputMethodService {
     public void onFinishInputView(boolean finishingInput) {
         super.onFinishInputView(finishingInput);
         keyboardShown = false;
-        ic = null;
+        controller.hidePopUpBar();
+        controller.getTextController().reset();
+        controller.resetFocus();
+        //ic = null;
     }
 
     @Override
@@ -65,7 +74,9 @@ public class KeyboardImeService extends InputMethodService {
                 case KeyEvent.KEYCODE_DPAD_UP:
                     temaImeLogger.writeToLog("UP",false);
                 case KeyEvent.KEYCODE_DPAD_DOWN:
-                    temaImeLogger.writeToLog("DOWN",false);
+                    if(keyCode == KeyEvent.KEYCODE_DPAD_DOWN){
+                        temaImeLogger.writeToLog("DOWN",false);
+                    }
 
                     controller.hidePopUpBar();
                     Cell newCell = controller.findNewFocus(keyCode);
@@ -76,21 +87,34 @@ public class KeyboardImeService extends InputMethodService {
                     }
                     break;
                 case KeyEvent.KEYCODE_DPAD_CENTER:
-                    temaImeLogger.writeToLog("CENTER",false);
                 case KeyEvent.KEYCODE_0:    //todo remove - just for emulator test OK
                     Cell focus = controller.getFocusController_().getCurrentFocus();
                     Key key = controller.getKeysController().getKeyAtPosition(focus);
+
+                    String btn;
+                    if(key.getCode() == Controller.ENTER_KEY)
+                        btn = "INVIO";
+                    else btn = key.getLabel();
+                    temaImeLogger.writeToLog("CENTER: "+btn,false);
+
+
+
+
+
                     int code = key.getCode();
                     if(code!=Controller.FAKE_KEY){
                         char character = (char) code;
                         if(code!=Controller.ENTER_KEY && code!=Controller.DEL_KEY)
                             controller.getTextController().addCharacterWritten(character);
                         handleText(code, ic);
+
                         //if letter or space
-                        if(isLetter(key.getLabel().charAt(0)) || key.getLabel().charAt(0)==' ') {
-                            controller.showPopUpBar();
-                        }else {
-                            controller.hidePopUpBar();
+                        if(code!=Controller.ENTER_KEY && code!=Controller.DEL_KEY){
+                            if(isLetter(key.getLabel().charAt(0)) || key.getLabel().charAt(0)==' ') {
+                                controller.showPopUpBar();
+                            }else {
+                                controller.hidePopUpBar();
+                            }
                         }
                     }else {
                         controller.hidePopUpBar();
@@ -101,6 +125,9 @@ public class KeyboardImeService extends InputMethodService {
                     //write char
                     if(controller.getSuggestionsController().isShown()){
                         Key k1 = controller.getFourSuggestionsCode().get(0);
+
+                        temaImeLogger.writeToLog("RED: "+k1.getLabel(),false);
+
                         handleText( k1.getCode(), ic);
                         controller.getTextController().addCharacterWritten(k1.getLabel().charAt(0));
                         //update bar
@@ -110,8 +137,12 @@ public class KeyboardImeService extends InputMethodService {
                     break;
                 case KeyEvent.KEYCODE_2:
                 case KeyEvent.KEYCODE_PROG_GREEN:
+                    //temaImeLogger.writeToLog("GREEN",false);
                     if(controller.getSuggestionsController().isShown()){
                         Key k2 = controller.getFourSuggestionsCode().get(1);
+
+                        temaImeLogger.writeToLog("GREEN: "+k2.getLabel(),false);
+
                         handleText( k2.getCode(), ic);
                         controller.getTextController().addCharacterWritten(k2.getLabel().charAt(0));
                         //update bar
@@ -121,8 +152,12 @@ public class KeyboardImeService extends InputMethodService {
                     break;
                 case KeyEvent.KEYCODE_3:
                 case KeyEvent.KEYCODE_PROG_YELLOW:
+                    //temaImeLogger.writeToLog("YELLOW",false);
                     if(controller.getSuggestionsController().isShown()){
                         Key k3 = controller.getFourSuggestionsCode().get(2);
+
+                        temaImeLogger.writeToLog("YELLOW: "+k3.getLabel(),false);
+
                         handleText( k3.getCode(), ic);
                         controller.getTextController().addCharacterWritten(k3.getLabel().charAt(0));
                         //update bar
@@ -132,8 +167,12 @@ public class KeyboardImeService extends InputMethodService {
                     break;
                 case KeyEvent.KEYCODE_4:
                 case KeyEvent.KEYCODE_PROG_BLUE:
+                    //temaImeLogger.writeToLog("BLUE",false);
                     if(controller.getSuggestionsController().isShown()){
                         Key k4 = controller.getFourSuggestionsCode().get(3);
+
+                        temaImeLogger.writeToLog("BLUE: "+k4.getLabel(),false);
+
                         handleText( k4.getCode(), ic);
                         controller.getTextController().addCharacterWritten(k4.getLabel().charAt(0));
                         //update bar

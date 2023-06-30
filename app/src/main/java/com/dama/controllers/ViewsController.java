@@ -27,7 +27,10 @@ public class ViewsController {
         keyboardView.initKeyboardView(keys);
 
         KeyView keyView = keyboardView.getKeyViewAtCell(focus);
-        containerView.initContainerView(keyView, popupBarView);
+        keyView.post(()->{
+            containerView.initContainerView(keyView, popupBarView);
+        });
+
     }
 
     public void moveCursorPosition(Cell focus){
