@@ -49,6 +49,12 @@ public class KeyboardImeService extends InputMethodService {
     }
 
     @Override
+    public void onFinishInput() {
+        super.onFinishInput();
+        controller.getTextController().reset();
+    }
+
+    @Override
     public void onFinishInputView(boolean finishingInput) {
         super.onFinishInputView(finishingInput);
         keyboardShown = false;

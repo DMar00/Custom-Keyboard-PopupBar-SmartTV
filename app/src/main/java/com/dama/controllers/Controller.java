@@ -156,11 +156,11 @@ public class Controller {
         viewsController.addPopupBar(curFocus);
 
         //add highlights
-        Cell k1 = keysController.getCharPosition(fourSuggestions[0]);
+        /*Cell k1 = keysController.getCharPosition(fourSuggestions[0]);
         Cell k2 = keysController.getCharPosition(fourSuggestions[1]);
         Cell k3 = keysController.getCharPosition(fourSuggestions[2]);
         Cell k4 = keysController.getCharPosition(fourSuggestions[3]);
-        viewsController.addHighlights(k1, k2, k3, k4);
+        viewsController.addHighlights(k1, k2, k3, k4);*/
 
         //
         suggestionsController.setShown(true);
@@ -168,7 +168,7 @@ public class Controller {
 
     public void hidePopUpBar(){
         viewsController.hidePopupBar();
-        viewsController.hideHighLights();
+        //viewsController.hideHighLights();
         suggestionsController.setShown(false);
     }
 

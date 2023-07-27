@@ -11,7 +11,7 @@ import java.util.List;
 
 public class SuggestionsGenerator {
     public final static int BASE = 28;
-    public final static int NUM_SUG = 12;
+    public final static int NUM_SUG = 18;
     private String fileString;
 
     public SuggestionsGenerator(Context context) {
